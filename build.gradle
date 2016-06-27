@@ -120,7 +120,7 @@ bintray {
         version = versionName
         stdout = new ByteArrayOutputStream()
         exec {
-            commandLine 'git', 'log', '-1'
+            commandLine 'git', 'log', '-1', '--pretty=%B' // pretty to hide email
             standardOutput = stdout
         }
         description = stdout.toString().trim()
