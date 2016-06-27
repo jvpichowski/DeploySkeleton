@@ -114,11 +114,11 @@ bintray {
     }
     def r = stdout.toString().trim()
     if(r.split('-').length > 1){
-        versionType = 'nigthly'
+        versionType = 'nigthly'//'-dev'
         versionName = r.split('-g')[1]
         version = versionName
     }else{
-        versionType = 'release'
+        versionType = 'release'//''
         versionName = r
         version = versionName
     }
@@ -136,12 +136,12 @@ bintray {
     override = false //[Default: false] Whether to override version artifacts already published
     pkg {
         repo = 'maven'
-        name = project.name
+        name = project.name+'-'+versionType//remove +'-'
         userOrg = user
         licenses = ['BSD 3-Clause']
         vcsUrl = gitUrl
         version {
-            name = versionType
+            name = versionName
             desc = 'some description'
             released  = new Date()
             licenses = ['BSD 3-Clause']
