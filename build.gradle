@@ -104,6 +104,7 @@ def gitUrl = 'https://github.com/jvpichowski/DeploySkeleton'
 bintray {
 
     def versionType
+    def versionName
 
     def stdout = new ByteArrayOutputStream()
     exec {
@@ -113,10 +114,10 @@ bintray {
     def r = stdout.toString().trim()
     if(r.split('-').length > 1){
         versionType = 'nigthly'
-        version = r.split('-g')[1]
+        versionName = r.split('-g')[1]
     }else{
         versionType = 'release'
-        version = r
+        versionName = r
     }
 
     Properties properties = new Properties()
@@ -141,7 +142,7 @@ bintray {
             desc = 'some description'
             released  = new Date()
             licenses = ['BSD 3-Clause']
-            vcsTag = version
+            vcsTag = versionName
         }
     }
 }
