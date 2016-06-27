@@ -7,6 +7,10 @@
  * user guide available at https://docs.gradle.org/2.9/userguide/tutorial_java_projects.html
  */
 
+// Add the bintray plugin for deployment
+plugins {
+    id "com.jfrog.bintray" version "1.7"
+}
 
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
@@ -30,3 +34,113 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+group = 'com.example'
+
+def versionType = ''
+def versionName
+def gitUrl = 'https://github.com/jvpichowski/DeploySkeleton'
+//Those will be filled on deployNightly or deployRelease
+
+
+
+/**
+ * Returns the last tag name
+ */
+def getTagName = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe', '--abbrev=0', '--tags'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+/**
+ * Returns the last commit hash
+ */
+def getHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+
+task deployRelease {
+    doLast {
+        println "dr"
+        versionType = 'release'
+        versionName = getTagName()
+
+
+    }
+}
+deployRelease.finalizedBy bintrayUpload
+
+task deployNightly {
+    doLast {
+        println "dn"
+        versionType = 'nigthly'
+        versionName = getHash()
+        project.rootProject.bintray{
+            user = 'me'
+        }
+    }
+}
+//deployNightly.finalizedBy bintrayUpload
+
+bintrayUpload.doFirst{
+    println project.rootProject.bintray.user
+    project.rootProject.bintray{
+        user = ''
+    }
+}
+bintrayUpload.doLast{
+    println project.rootProject.bintray.user
+}
+
+bintray {git describe --exact-match HEAD
+
+    Properties properties = new Properties()
+    if(project.rootProject.file('local.properties').exists()) {
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    }
+    user = properties.getProperty('bintrayUser', System.getenv('BINTRAY_USER'))
+    key = properties.getProperty('bintrayApiKey', System.getenv('BINTRAY_API_KEY'))
+    configurations = ['archives']
+//    licenses = ['BSD 3-Clause']
+    dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
+    publish = true //[Default: false] Whether version should be auto published after an upload
+    override = false //[Default: false] Whether to override version artifacts already published
+    pkg {
+        repo = 'maven'
+        name = project.name
+        userOrg = user
+        licenses = ['BSD 3-Clause']
+        vcsUrl = gitUrl
+        version {
+            name = versionType
+            desc = 'some description'
+            released  = new Date()
+            licenses = ['BSD 3-Clause']
+            vcsTag = version
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
