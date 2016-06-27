@@ -106,6 +106,7 @@ bintray {
 
     def versionType
     def versionName
+    def description = ''
 
     def stdout = new ByteArrayOutputStream()
     exec {
@@ -117,6 +118,12 @@ bintray {
         versionType = 'nigthly'//'-dev'
         versionName = r.split('-g')[1]
         version = versionName
+        stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'log', '-1'
+            standardOutput = stdout
+        }
+        description = stdout.toString().trim()
     }else{
         versionType = 'release'//''
         versionName = r
@@ -142,7 +149,7 @@ bintray {
         vcsUrl = gitUrl
         version {
             name = versionName
-            desc = 'some description'
+            desc = description
             released  = new Date()
             licenses = ['BSD 3-Clause']
             vcsTag = versionName
