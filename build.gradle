@@ -35,6 +35,7 @@ dependencies {
 }
 
 group = 'com.example'
+version = ''
 
 //def versionType = ''
 //def versionName
@@ -115,9 +116,11 @@ bintray {
     if(r.split('-').length > 1){
         versionType = 'nigthly'
         versionName = r.split('-g')[1]
+        version = versionName
     }else{
         versionType = 'release'
         versionName = r
+        version = versionName
     }
 
     Properties properties = new Properties()
