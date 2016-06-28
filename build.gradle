@@ -48,13 +48,19 @@ bintray {
         commandLine 'git', 'describe', '--tags'
         standardOutput = stdout
     }
-    def r = stdout.toString().trim()
-    if(r.split('-').length > 1){
+    def tagDesc = stdout.toString().trim()
+    stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe', '--tags'
+        standardOutput = stdout
+    }
+    def vcsTagDesc = stdout.toString().trim()
+    if(tagDesc.split('-').length > 1){
         if(deployDevVersion == 'false'){
             bintrayUpload.enabled = false
         }
         versionType = '-dev'
-        versionName = r.split('-g')[1]
+        versionName = tagDesc.split('-g')[1]
         version = versionName
         stdout = new ByteArrayOutputStream()
         exec {
@@ -64,7 +70,7 @@ bintray {
         description = stdout.toString().trim()
     }else{
         versionType = ''
-        versionName = r
+        versionName = tagDesc
         version = versionName
         stdout = new ByteArrayOutputStream()
         exec {
@@ -95,7 +101,7 @@ bintray {
             desc = description
             released  = new Date()
             licenses = ['BSD 3-Clause']
-            vcsTag = versionName
+            vcsTag = vcsTagDesc
         }
     }
 }
