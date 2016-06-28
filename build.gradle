@@ -7,14 +7,6 @@
  * user guide available at https://docs.gradle.org/2.9/userguide/tutorial_java_projects.html
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
-    }
-}
 // Add the bintray plugin for deployment
 plugins {
     id "com.jfrog.bintray" version "1.7"
@@ -23,7 +15,6 @@ plugins {
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 apply plugin: 'maven' //needed for dependency snipped on bintray
-apply plugin: 'gradle-one-jar'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -31,7 +22,6 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
 }
-
 // In this section you declare the dependencies for your production and test code
 dependencies {
     // The production code uses the SLF4J logging API at compile time
@@ -58,12 +48,6 @@ bintray {
         standardOutput = stdout
     }
     def tagDesc = stdout.toString().trim()
-//    stdout = new ByteArrayOutputStream()
-//    exec {
-//        commandLine 'git', 'describe'
-//        standardOutput = stdout
-//    }
-//    def vcsTagDesc = stdout.toString().trim()
     if(tagDesc.split('-').length > 1){
         if(deployDevVersion == 'false'){
             bintrayUpload.enabled = false
@@ -124,12 +108,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
-
-task standaloneJar(type: OneJar) {
-    mainClass = 'Main'
-    archiveName = 'standalone.jar'
-}
-build.dependsOn standaloneJar
 
 artifacts {
     archives javadocJar
