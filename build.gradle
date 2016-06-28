@@ -7,6 +7,14 @@
  * user guide available at https://docs.gradle.org/2.9/userguide/tutorial_java_projects.html
  */
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
+}
 // Add the bintray plugin for deployment
 plugins {
     id "com.jfrog.bintray" version "1.7"
@@ -15,6 +23,7 @@ plugins {
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 apply plugin: 'maven' //needed for dependency snipped on bintray
+apply plugin: 'gradle-one-jar'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -115,6 +124,12 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
+
+task standaloneJar(type: OneJar) {
+    mainClass = 'Main'
+    archiveName = 'standalone.jar'
+}
+build.dependsOn standaloneJar
 
 artifacts {
     archives javadocJar

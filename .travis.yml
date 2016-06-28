@@ -10,7 +10,7 @@ deploy:
   provider: releases
   api_key:
    secure: "UZx3eL3sS6Iwwop9rT2S3HH5geJCYMzD16zgPiPncGupGPxueVtL1/znn8U3JfxnZb7VCtTzwzCWVxPJPOu68vQLWiYjv4BdAoWU2LLC8/avQmzEQJ0Tr4PA9ttpaBd58vAnZ1igvh0KC/oG2tyP8iu6erQn+X9krrQd21GWNxnw27/VBe64dKNxCDX3MpU4EINQ/B8P4KGvfezOho6ejRxZQ9D/xWb6ZE8lqN2zhGS6O6/Bte7IWN9s0zaO2OhqVZIS1tWayYT6/X8dpYCMPMNiFCktoU/0zy1CIFZ7ngci6NjCyQSc7kXGCtGDe/XJO9mn94T5YSOEiVpG0+Me/SlLMgXij1VBblXn/ZssuOXxIg8IUCpr8VH540HtmVAcDnPxGpyOOQJqaUTW6G4ZPXLNcgHyyp1KQcDg4Pjbx9vNo6alyeEs0mYvsvT3CENxaUstnbhlNLQ5U4ie8eOjjvxK7H8kFxErLee9ZblBIk6iqSeKEQTWRBfbSDMxDJk5E9IsGbd1wrhkLMlVJBxVyZP0sFZ3dYI1TXMAbB2SaezExK+ZgqPie1srGvChUyxJJGyuo1r7pwAWfyUpg4g4sYF0EVIVPr3SZ84XWJJixEAku7JG7KPFrTT5o1Xa6Tu8RCew7Ygmc0oeUKaNcq0a9cfdFr4Ca39EfPTrb5Y+jMM="
-  file: "build/libs/*.jar"
+  file: "build/libs/standalone.jar"
   skip_cleanup: true
   on:
     tags: true
