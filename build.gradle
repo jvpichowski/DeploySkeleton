@@ -37,70 +37,6 @@ dependencies {
 
 version = ''
 
-//def versionType = ''
-//def versionName
-//Those will be filled on deployNightly or deployRelease
-
-
-
-///**
-// * Returns the last tag name
-// */
-//def getTagName = { ->
-//    def stdout = new ByteArrayOutputStream()
-//    exec {
-//        commandLine 'git', 'describe', '--abbrev=0', '--tags'
-//        standardOutput = stdout
-//    }
-//    return stdout.toString().trim()
-//}
-//
-///**
-// * Returns the last commit hash
-// */
-//def getHash = { ->
-//    def stdout = new ByteArrayOutputStream()
-//    exec {
-//        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-//        standardOutput = stdout
-//    }
-//    return stdout.toString().trim()
-//}
-//
-//
-//task deployRelease {
-//    doLast {
-//        println "dr"
-//        versionType = 'release'
-//        versionName = getTagName()
-//
-//
-//    }
-//}
-//deployRelease.finalizedBy bintrayUpload
-//
-//task deployNightly {
-//    doLast {
-//        println "dn"
-//        versionType = 'nigthly'
-//        versionName = getHash()
-//        project.rootProject.bintray{
-//            user = 'me'
-//        }
-//    }
-//}
-////deployNightly.finalizedBy bintrayUpload
-//
-//bintrayUpload.doFirst{
-//    println project.rootProject.bintray.user
-//    project.rootProject.bintray{
-//        user = ''
-//    }
-//}
-//bintrayUpload.doLast{
-//    println project.rootProject.bintray.user
-//}
-
 bintray {
 
     def versionType
@@ -127,7 +63,7 @@ bintray {
         }
         description = stdout.toString().trim()
     }else{
-        versionType = 'release'//''
+        versionType = ''
         versionName = r
         version = versionName
         stdout = new ByteArrayOutputStream()
@@ -135,7 +71,7 @@ bintray {
             commandLine 'git', 'tag', '-l', '-n9', versionName
             standardOutput = stdout
         }
-        description = stdout.toString().trim()
+        description = stdout.toString().trim().replaceAll(versionName, '')
     }
 
     Properties properties = new Properties()
@@ -145,7 +81,6 @@ bintray {
     user = properties.getProperty('bintrayUser', System.getenv('BINTRAY_USER'))
     key = properties.getProperty('bintrayApiKey', System.getenv('BINTRAY_API_KEY'))
     configurations = ['archives']
-//    licenses = ['BSD 3-Clause']
     dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
     publish = true //[Default: false] Whether version should be auto published after an upload
     override = false //[Default: false] Whether to override version artifacts already published
