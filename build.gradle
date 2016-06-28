@@ -35,12 +35,10 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-group = 'com.example'
 version = ''
 
 //def versionType = ''
 //def versionName
-def gitUrl = 'https://github.com/jvpichowski/DeploySkeleton'
 //Those will be filled on deployNightly or deployRelease
 
 
@@ -116,7 +114,10 @@ bintray {
     }
     def r = stdout.toString().trim()
     if(r.split('-').length > 1){
-        versionType = 'nigthly'//'-dev'
+        if(deployDevVersion == 'false'){
+            bintrayUpload.enabled = false
+        }
+        versionType = '-dev'
         versionName = r.split('-g')[1]
         version = versionName
         stdout = new ByteArrayOutputStream()
@@ -129,6 +130,12 @@ bintray {
         versionType = 'release'//''
         versionName = r
         version = versionName
+        stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'tag', '-l', '-n9', versionName
+            standardOutput = stdout
+        }
+        description = stdout.toString().trim()
     }
 
     Properties properties = new Properties()
@@ -144,7 +151,7 @@ bintray {
     override = false //[Default: false] Whether to override version artifacts already published
     pkg {
         repo = 'maven'
-        name = project.name+'-'+versionType//remove +'-'
+        name = project.name+versionType
         userOrg = user
         licenses = ['BSD 3-Clause']
         vcsUrl = gitUrl
