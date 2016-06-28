@@ -5,7 +5,7 @@ package com.example.deploy;
  */
 public class ExampleLibrary {
 
-    public static String getMessage(){
-        return "Hello World!";
+    public static String getMessage(String name){
+        return "Hello "+name+"!";
     }
 }

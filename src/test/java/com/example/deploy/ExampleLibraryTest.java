@@ -6,7 +6,7 @@ package com.example.deploy;
 public class ExampleLibraryTest {
 
     public static void main(String... args){
-        System.out.println(ExampleLibrary.getMessage());
+        System.out.println(ExampleLibrary.getMessage("World"));
     }
 
 }
