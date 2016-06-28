@@ -94,13 +94,13 @@ bintray {
         repo = 'maven'
         name = project.name+versionType
         userOrg = user
-        licenses = ['BSD 3-Clause']
+        licenses = [license]
         vcsUrl = gitUrl
         version {
             name = versionName
             desc = description
             released  = new Date()
-            licenses = ['BSD 3-Clause']
+            licenses = [license]
             vcsTag = versionName
         }
     }
