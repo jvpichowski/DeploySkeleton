@@ -1,0 +1,7 @@
+language: java
+#needed for gradle
+jdk:
+  - oraclejdk8
+#deploy
+after_success:
+- ./gradlew bintrayUpload
