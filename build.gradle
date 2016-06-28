@@ -49,12 +49,12 @@ bintray {
         standardOutput = stdout
     }
     def tagDesc = stdout.toString().trim()
-    stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags'
-        standardOutput = stdout
-    }
-    def vcsTagDesc = stdout.toString().trim()
+//    stdout = new ByteArrayOutputStream()
+//    exec {
+//        commandLine 'git', 'describe'
+//        standardOutput = stdout
+//    }
+//    def vcsTagDesc = stdout.toString().trim()
     if(tagDesc.split('-').length > 1){
         if(deployDevVersion == 'false'){
             bintrayUpload.enabled = false
@@ -101,7 +101,7 @@ bintray {
             desc = description
             released  = new Date()
             licenses = ['BSD 3-Clause']
-            vcsTag = vcsTagDesc
+            vcsTag = versionName
         }
     }
 }
