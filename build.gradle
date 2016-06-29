@@ -38,6 +38,11 @@ version = ''
 
 bintray {
 
+    def env = System.getenv()
+    env.each{
+        println it
+    }
+
     def isTag = false;
     def versionType
     def versionName
@@ -119,6 +124,8 @@ bintray {
             vcsTag = versionName
         }
     }
+
+    bintrayUpload.enabled = false
 }
 
 task sourcesJar(type: Jar) {
