@@ -36,96 +36,135 @@ dependencies {
 
 version = ''
 
-bintray {
 
-    def env = System.getenv()
-    env.each{
-        println it
-    }
-
-    def isTag = false;
-    def versionType
-    def versionName
-    def description = ''
-
+def getTagDescGit = { ->
     def stdout = new ByteArrayOutputStream()
     exec {
         commandLine 'git', 'describe', '--tags'
         standardOutput = stdout
     }
-    def tagDesc = stdout.toString().trim()
-    if (tagDesc.split('-').length > 1) {
-        if (deployDevVersion == 'false') {
-            bintrayUpload.enabled = false
-        }
-        versionType = '-dev'
-        versionName = tagDesc.split('-g')[1]
-        version = versionName
-        stdout = new ByteArrayOutputStream()
-        exec {
-            commandLine 'git', 'log', '-1', '--pretty=%B' // pretty to hide email
-            standardOutput = stdout
-        }
-        description = stdout.toString().trim()
-        isTag = false
-    } else {
-        versionType = ''
-        versionName = tagDesc
-        version = versionName
-        stdout = new ByteArrayOutputStream()
-        exec {
-            commandLine 'git', 'tag', '-l', '-n9', versionName
-            standardOutput = stdout
-        }
-        description = stdout.toString().trim().replaceAll(versionName, '')
-        isTag = true
+    return stdout.toString().trim()
+}
+
+def getTagGit = { ->
+    def tagDesc = getTagDescGit()
+    if(tagDesc.split('-').length > 1) {
+        return ''
     }
-    stdout = new ByteArrayOutputStream()
+    return tagDesc
+}
+
+def getCommitGit = { ->
+    def tagDesc = getTagDescGit()
+    if(tagDesc.split('-').length > 1) {
+        return tagDesc.split('-g')[1]
+    }
+    return ''
+}
+
+def getBranchGit = { ->
+    def stdout = new ByteArrayOutputStream()
     exec {
         commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
         standardOutput = stdout
     }
-    def branch = stdout.toString().trim()
-    if (!this.hasProperty("branch_$branch")) {
-        bintrayUpload.enabled = false
+    return stdout.toString().trim()
+}
+
+def getTagCommentGit = { tagName ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'tag', '-l', '-n9', tagName
+        standardOutput = stdout
+    }
+    return stdout.toString().trim().replaceAll(versionName, '')
+}
+
+def getCommitCommentGit = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'log', '-1', '--pretty=%B' // pretty to hide email
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+bintray{
+
+    def branch
+    def commit
+    def tag
+    def bintrayUser
+    def bintrayApiKey
+
+    //disabled by default
+    bintrayUpload.enabled = false
+    if(System.getenv().containsKey("TRAVIS_EVENT_TYPE")) {
+        //build runs on travis and not manually by the user
+
+        if(System.getenv().get("TRAVIS_PULL_REQUEST") != "false") {
+            //we are not interested in building after pull requests
+
+            //we are lazy and use the information given by travis
+            branch = System.getenv().get("TRAVIS_BRANCH")
+            commit = System.getenv().get("TRAVIS_COMMIT")
+            tag = System.getenv().get("TRAVIS_TAG")
+            //you have to set this on the travis website
+            bintrayUser = System.getenv('BINTRAY_USER')
+            bintrayApiKey = System.getenv('BINTRAY_API_KEY')
+
+            if(tag != '' || deployDevVersion) {
+                bintrayUpload.enabled = true
+            }
+        }
     }else{
-        if(this."branch_$branch" == "no"){
-            bintrayUpload.enabled = false
+        //build is manually triggered by the user
+        //maybe some local properties exists
+        Properties properties = new Properties()
+        if(project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
         }
-        if(this."branch_$branch" == "tag" && isTag){
-            bintrayUpload.enabled = true
-        }
-        if(this."branch_$branch" == "always"){
-            bintrayUpload.enabled = true
-        }
+        //the bintray credentials have to either exist in local.properties or as environment variable
+        bintrayUser = properties.getProperty('bintrayUser', System.getenv('BINTRAY_USER'))
+        bintrayApiKey = properties.getProperty('bintrayApiKey', System.getenv('BINTRAY_API_KEY'))
+
+        //read configuration from git
+        branch = getBranchGit()
+        commit = getCommitGit()
+        tag = getTagGit()
+
+        //always deploy if manually triggered
+        bintrayUpload.enabled = true
     }
 
-    Properties properties = new Properties()
-    if(project.rootProject.file('local.properties').exists()) {
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    }
-    user = properties.getProperty('bintrayUser', System.getenv('BINTRAY_USER'))
-    key = properties.getProperty('bintrayApiKey', System.getenv('BINTRAY_API_KEY'))
+    //shorten commit hash to default length
+    commit = commit.substring(0, 6)
+
+    def bintrayProjectName = project.name+'-'+branch+(tag == '' ? '-dev' : '')
+    def bintrayVersionName = (tag == '' ? commit : tag)
+    def bintrayVersionDesc = (tag == '' ? getCommitCommentGit() : getTagCommentGit())
+    version = bintrayVersionName
+
+    user = bintrayUser
+    key = bintrayApiKey
     configurations = ['archives']
     dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
     publish = true //[Default: false] Whether version should be auto published after an upload
     override = false //[Default: false] Whether to override version artifacts already published
     pkg {
         repo = 'maven'
-        name = project.name+versionType
+        name = bintrayProjectName
         userOrg = user
         licenses = [license]
         vcsUrl = gitUrl
         version {
-            name = versionName
-            desc = description
+            name = bintrayVersionName
+            desc = bintrayVersionDesc
             released  = new Date()
             licenses = [license]
-            vcsTag = versionName
+            vcsTag = bintrayVersionName
         }
     }
-
-    bintrayUpload.enabled = false
 }
 
 task sourcesJar(type: Jar) {
