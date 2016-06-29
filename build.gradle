@@ -148,7 +148,7 @@ bintray{
     def bintrayProjectName = project.name+'-'+branch+(tag == '' ? '-dev' : '')
     def bintrayVersionName = (tag == '' ? commit : tag)
     def bintrayVersionDesc = (tag == '' ? getCommitCommentGit() : getTagCommentGit())
-    version = date
+    version = bintrayVersionName
 
     user = bintrayUser
     key = bintrayApiKey
@@ -163,7 +163,7 @@ bintray{
         licenses = [license]
         vcsUrl = gitUrl
         version {
-            name = bintrayVersionName
+            name = (tag == '' ? date+' ' : '')+bintrayVersionName
             desc = bintrayVersionDesc
             released  = new Date()
             licenses = [license]
