@@ -96,18 +96,18 @@ bintray{
 
     def date = new SimpleDateFormat("yyyy-MM-dd").format(new Date())
 
-    def branch
-    def commit
-    def tag
-    def bintrayUser
-    def bintrayApiKey
+    def branch = ''
+    def commit = ''
+    def tag = ''
+    def bintrayUser = ''
+    def bintrayApiKey = ''
 
     //disabled by default
     bintrayUpload.enabled = false
     if(System.getenv().containsKey("TRAVIS_EVENT_TYPE")) {
         //build runs on travis and not manually by the user
 
-        if(System.getenv().get("TRAVIS_PULL_REQUEST") != "false") {
+        if(System.getenv().get("TRAVIS_PULL_REQUEST") == 'false') {
             //we are not interested in building after pull requests
 
             //we are lazy and use the information given by travis
