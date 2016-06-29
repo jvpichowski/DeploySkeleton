@@ -38,6 +38,7 @@ version = ''
 
 bintray {
 
+    def isTag = false;
     def versionType
     def versionName
     def description = ''
@@ -48,8 +49,8 @@ bintray {
         standardOutput = stdout
     }
     def tagDesc = stdout.toString().trim()
-    if(tagDesc.split('-').length > 1){
-        if(deployDevVersion == 'false'){
+    if (tagDesc.split('-').length > 1) {
+        if (deployDevVersion == 'false') {
             bintrayUpload.enabled = false
         }
         versionType = '-dev'
@@ -61,7 +62,8 @@ bintray {
             standardOutput = stdout
         }
         description = stdout.toString().trim()
-    }else{
+        isTag = false
+    } else {
         versionType = ''
         versionName = tagDesc
         version = versionName
@@ -71,6 +73,26 @@ bintray {
             standardOutput = stdout
         }
         description = stdout.toString().trim().replaceAll(versionName, '')
+        isTag = true
+    }
+    stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+        standardOutput = stdout
+    }
+    def branch = stdout.toString().trim()
+    if (!this.hasProperty("branch_$branch")) {
+        bintrayUpload.enabled = false
+    }else{
+        if(this."branch_$branch" == "no"){
+            bintrayUpload.enabled = false
+        }
+        if(this."branch_$branch" == "tag" && isTag){
+            bintrayUpload.enabled = true
+        }
+        if(this."branch_$branch" == "always"){
+            bintrayUpload.enabled = true
+        }
     }
 
     Properties properties = new Properties()
