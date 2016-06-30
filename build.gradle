@@ -119,6 +119,11 @@ bintray{
             if(tag != '' || deployDevVersion) {
                 bintrayUpload.enabled = true
             }
+
+            //TODO:
+            //add deploy to repo-nightly if TRAVIS_EVENT_TYPE equals cron
+            //and deplyNightlyVersion is enabled
+            //use only the date as description
         }
     }else{
         //build is manually triggered by the user
@@ -140,10 +145,24 @@ bintray{
         bintrayUpload.enabled = true
     }
 
+    //disable upload to branches which are not defined
+    def branchList = deployBranches.replaceAll("\\s","").replace('[',',').replace(']',',')
+    if(!branchList.contains(','+branch+',')){
+        bintrayUpload.enabled = false
+        println "This branch isn't accepted for deployment!"
+    }
+
     //shorten commit hash to default length
     commit = commit.substring(0, 6)
 
-    def bintrayProjectName = project.name+'-'+branch+(tag == '' ? '-dev' : '')
+    //Use branch name as addition to the project name to
+    //enable build of different branches. The master branch
+    //does not change the name.
+    //If it is a tag release it will be deployed to the
+    //default repository. If it is a commit deploy it will
+    //be deployed to the dev version.
+    //TODO: Add cron deploy to nightly version
+    def bintrayProjectName = project.name+(branch == 'master' ? '' : '-'+branch)+(tag == '' ? '-dev' : '')
     def bintrayCommitName = (tag == '' ? commit : tag)
     def bintrayVersionDesc = (tag == '' ? getCommitCommentGit() : getTagCommentGit())
     def bintrayVersionName = (tag == '' ? date + '#' : '') + bintrayCommitName
