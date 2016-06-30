@@ -38,6 +38,14 @@ dependencies {
 
 version = ''
 
+def getDescGit = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
 
 def getTagDescGit = { ->
     def stdout = new ByteArrayOutputStream()
@@ -145,9 +153,10 @@ bintray{
     commit = commit.substring(0, 6)
 
     def bintrayProjectName = project.name+'-'+branch+(tag == '' ? '-dev' : '')
-    def bintrayVersionName = (tag == '' ? commit : tag)
+    def bintrayCommitName = (tag == '' ? commit : tag)
     def bintrayVersionDesc = (tag == '' ? getCommitCommentGit() : getTagCommentGit())
-    version = bintrayVersionName
+    def bintrayVersionName = (tag == '' ? date + '#' : '') + bintrayCommitName
+    version = bintrayVersionName.replaceAll("#","_")
 
     user = bintrayUser
     key = bintrayApiKey
@@ -162,22 +171,23 @@ bintray{
         licenses = [license]
         vcsUrl = gitUrl
         version {
-            name = (tag == '' ? date + '#' : '') + bintrayVersionName
+            name = bintrayVersionName
             desc = bintrayVersionDesc
             released = new Date()
             licenses = [license]
-            vcsTag = bintrayVersionName
+            vcsTag = getDescGit()
         }
     }
 
     if(bintrayUpload.enabled){
-        def vn = (tag == '' ? date + '#' : '') + bintrayVersionName
         println ''
         println "deploying to bintray..."
         println "project name: $bintrayProjectName"
-        println "version name: $vn"
-        println "version: $bintrayVersionName"
-        println "URL: https://bintray.com/$bintrayUser/maven/$bintrayProjectName/$vn/view".replaceAll("#", "%23")
+        println "version name: $bintrayVersionName"
+        println "commit: $bintrayCommitName"
+        println "Website URL: https://bintray.com/$bintrayUser/maven/$bintrayProjectName/$bintrayVersionName/view".replaceAll("#", "%23")
+        def bintrayGroup = group.replace(".",'/')
+        println "Repository URL: https://dl.bintray.com/$bintrayUser/maven/$bintrayGroup/$bintrayProjectName/$version/"
         println ''
     }
 }
