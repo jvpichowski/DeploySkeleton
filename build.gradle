@@ -38,15 +38,6 @@ dependencies {
 
 version = ''
 
-def getDescGit = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
 def getTagDescGit = { ->
     def stdout = new ByteArrayOutputStream()
     exec {
@@ -175,7 +166,7 @@ bintray{
             desc = bintrayVersionDesc
             released = new Date()
             licenses = [license]
-            vcsTag = getDescGit()
+            vcsTag = getTagDescGit()
         }
     }
 
