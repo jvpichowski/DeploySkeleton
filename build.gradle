@@ -163,7 +163,7 @@ bintray{
         licenses = [license]
         vcsUrl = gitUrl
         version {
-            name = (tag == '' ? date+' ' : '')+bintrayVersionName
+            name = (tag == '' ? date+'#' : '')+bintrayVersionName
             desc = bintrayVersionDesc
             released  = new Date()
             licenses = [license]
