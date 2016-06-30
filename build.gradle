@@ -192,14 +192,14 @@ bintray{
 
     if(bintrayUpload.enabled){
         println ''
-        println "deploying to bintray..."
-        println "project name: $bintrayProjectName"
-        println "version name: $bintrayVersionName"
-        println "commit: $bintrayCommitName"
-        println "Website URL: https://bintray.com/$bintrayUser/maven/$bintrayProjectName/$bintrayVersionName/view".replaceAll("#", "%23")
+        println "Deploying to bintray..."
+        println "Project: $bintrayProjectName"
+        println "Version: $bintrayVersionName"
+        println "Commit: $bintrayCommitName"
+        println "Website: https://bintray.com/$bintrayUser/maven/$bintrayProjectName/$bintrayVersionName/view".replaceAll("#", "%23")
         def bintrayGroup = group.replace(".",'/')
-        println "Repository URL: https://dl.bintray.com/$bintrayUser/maven/$bintrayGroup/$project.name/$version/"
-        println "Github URL: $gitUrl/tree/$bintrayCommitName"
+        println "Repository: https://dl.bintray.com/$bintrayUser/maven/$bintrayGroup/$project.name/$version/"
+        println "Github: $gitUrl/tree/$bintrayCommitName"
         println ''
     }
 }
