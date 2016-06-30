@@ -109,7 +109,12 @@ bintray{
             //we are not interested in building after pull requests
 
             //we are lazy and use the information given by travis
-            branch = System.getenv().get("TRAVIS_BRANCH")
+
+            //we have to use git branch because travis gives us
+            //the tag and not the current branch if it is triggered
+            //after a tag
+//            branch = System.getenv().get("TRAVIS_BRANCH")
+            branch = getBranchGit()
             commit = System.getenv().get("TRAVIS_COMMIT")
             tag = System.getenv().get("TRAVIS_TAG")
             //you have to set this on the travis website
