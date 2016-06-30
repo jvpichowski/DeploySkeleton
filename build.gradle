@@ -152,7 +152,7 @@ bintray{
     user = bintrayUser
     key = bintrayApiKey
     configurations = ['archives']
-    dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
+    dryRun = true //[Default: false] Whether to run this as dry-run, without deploying
     publish = true //[Default: false] Whether version should be auto published after an upload
     override = false //[Default: false] Whether to override version artifacts already published
     pkg {
@@ -166,7 +166,8 @@ bintray{
             desc = bintrayVersionDesc
             released = new Date()
             licenses = [license]
-            vcsTag = getTagDescGit()
+            vcsTag = bintrayCommitName
+            attributes = ['Github URL': "$gitUrl/tree/$bintrayCommitName"]
         }
     }
 
@@ -178,7 +179,8 @@ bintray{
         println "commit: $bintrayCommitName"
         println "Website URL: https://bintray.com/$bintrayUser/maven/$bintrayProjectName/$bintrayVersionName/view".replaceAll("#", "%23")
         def bintrayGroup = group.replace(".",'/')
-        println "Repository URL: https://dl.bintray.com/$bintrayUser/maven/$bintrayGroup/$bintrayProjectName/$version/"
+        println "Repository URL: https://dl.bintray.com/$bintrayUser/maven/$bintrayGroup/$project.name/$version/"
+        println "Github URL: $gitUrl/tree/$bintrayCommitName"
         println ''
     }
 }
