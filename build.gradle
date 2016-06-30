@@ -1,4 +1,3 @@
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 /*
@@ -163,12 +162,23 @@ bintray{
         licenses = [license]
         vcsUrl = gitUrl
         version {
-            name = (tag == '' ? date+'#' : '')+bintrayVersionName
+            name = (tag == '' ? date + '#' : '') + bintrayVersionName
             desc = bintrayVersionDesc
-            released  = new Date()
+            released = new Date()
             licenses = [license]
             vcsTag = bintrayVersionName
         }
+    }
+
+    if(bintrayUpload.enabled){
+        def vn = (tag == '' ? date + '#' : '') + bintrayVersionName
+        println ''
+        println "deploying to bintray..."
+        println "project name: $bintrayProjectName"
+        println "version name: $vn"
+        println "version: $bintrayVersionName"
+        println "URL: https://bintray.com/$bintrayUser/maven/$bintrayProjectName/$vn/view".replaceAll("#", "%23")
+        println ''
     }
 }
 
