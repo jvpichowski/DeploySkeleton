@@ -122,7 +122,7 @@ bintray{
 
             //TODO:
             //add deploy to repo-nightly if TRAVIS_EVENT_TYPE equals cron
-            //and deplyNightlyVersion is enabled
+            //and deploy NightlyVersion is enabled
             //use only the date as description
         }
     }else{
@@ -149,7 +149,7 @@ bintray{
     def branchList = deployBranches.replaceAll("\\s","").replace('[',',').replace(']',',')
     if(!branchList.contains(','+branch+',')){
         bintrayUpload.enabled = false
-        println "This branch isn't accepted for deployment!"
+        println "This branch \"$branch\" isn't accepted for deployment!"
     }
 
     //shorten commit hash to default length
