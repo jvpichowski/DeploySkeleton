@@ -130,6 +130,9 @@ bintray{
                 //we won't deploy that version to the master repository
                 if(repoSlug != System.getenv().get("TRAVIS_REPO_SLUG")){
                     bintrayUpload.enabled = false
+                }else{
+                    //we deploy tag releases only from the master branch
+                    branch = 'master'
                 }
             }
 
