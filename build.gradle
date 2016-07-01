@@ -91,6 +91,7 @@ def getCommitCommentGit = { ->
 }
 
 bintray{
+    def gitUrl = 'https://github.com/'+repoSlug
 
     def date = new SimpleDateFormat("yyyy-MM-dd").format(new Date())
 
@@ -110,11 +111,9 @@ bintray{
 
             //we are lazy and use the information given by travis
 
-            //we have to use git branch because travis gives us
-            //the tag and not the current branch if it is triggered
-            //after a tag
-//            branch = System.getenv().get("TRAVIS_BRANCH")
-            branch = getBranchGit()
+            //the current branch if triggered after commit or the tag
+            //if triggered after tagging
+            branch = System.getenv().get("TRAVIS_BRANCH")
             commit = System.getenv().get("TRAVIS_COMMIT")
             tag = System.getenv().get("TRAVIS_TAG")
             //you have to set this on the travis website
@@ -123,6 +122,15 @@ bintray{
 
             if(tag != '' || deployDevVersion) {
                 bintrayUpload.enabled = true
+            }
+            if(tag != ''){
+                //if triggered after tagging there is no new commit
+                commit = ''
+                //if the tag isn't created at the original repository
+                //we won't deploy that version to the master repository
+                if(repoSlug != System.getenv().get("TRAVIS_REPO_SLUG")){
+                    bintrayUpload.enabled = false
+                }
             }
 
             //TODO:
@@ -158,7 +166,9 @@ bintray{
     }
 
     //shorten commit hash to default length
-    commit = commit.substring(0, 6)
+    if(commit.length() > 6) {
+        commit = commit.substring(0, 6)
+    }
 
     //Use branch name as addition to the project name to
     //enable build of different branches. The master branch
