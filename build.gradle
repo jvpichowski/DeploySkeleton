@@ -78,7 +78,7 @@ def getTagCommentGit = { tagName ->
         commandLine 'git', 'tag', '-l', '-n9', tagName
         standardOutput = stdout
     }
-    return stdout.toString().trim().replace(versionName, '')
+    return stdout.toString().trim().replace(tagName, '')
 }
 
 def getCommitCommentGit = { ->
