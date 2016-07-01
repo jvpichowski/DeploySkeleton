@@ -4,4 +4,4 @@ jdk:
   - oraclejdk8
 #deploy
 after_success:
-- ./gradlew bintrayUpload --info
+- ./gradlew bintrayUpload

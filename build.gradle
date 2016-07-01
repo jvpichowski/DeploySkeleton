@@ -78,7 +78,7 @@ def getTagCommentGit = { tagName ->
         commandLine 'git', 'tag', '-l', '-n9', tagName
         standardOutput = stdout
     }
-    return stdout.toString().trim().replaceAll(versionName, '')
+    return stdout.toString().trim().replace(versionName, '')
 }
 
 def getCommitCommentGit = { ->
@@ -182,7 +182,7 @@ bintray{
     //TODO: Add cron deploy to nightly version
     def bintrayProjectName = project.name+(branch == 'master' ? '' : '-'+branch)+(tag == '' ? '-dev' : '')
     def bintrayCommitName = (tag == '' ? commit : tag)
-    def bintrayVersionDesc = (tag == '' ? getCommitCommentGit() : getTagCommentGit())
+    def bintrayVersionDesc = (tag == '' ? getCommitCommentGit() : getTagCommentGit(tag))
     def bintrayVersionName = (tag == '' ? date + '#' : '') + bintrayCommitName
     version = bintrayVersionName.replaceAll("#","_")
 
